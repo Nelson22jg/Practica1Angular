@@ -1,18 +1,29 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DataService } from '../data.service';
 
 @Component({
-  standalone: true,
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
-  imports: [RouterModule]
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  constructor(private router: Router) {}
+  loginForm: FormGroup;
 
-  onLogin() {
-    this.router.navigate(['/register']);
+  constructor(private fb: FormBuilder, private dataService: DataService) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
+    });
+  }
+
+  onSubmit(): void {
+    if (this.loginForm.valid) {
+      this.dataService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe(response => {
+        console.log('Login exitoso', response);
+      }, error => {
+        console.error('Error en el login', error);
+      });
+    }
   }
 }
